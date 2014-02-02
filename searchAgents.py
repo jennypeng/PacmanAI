@@ -518,31 +518,57 @@ def foodHeuristic(state, problem):
     #             result += 1
     # return result
     
-    import copy
-    from game import Grid
-    result = 0
-    position, foodGrid = state
-    food_coords = copy.copy(foodGrid.asList())
-    seen_food = Grid.copy(foodGrid) # make a copy of pacman's tags
-    current_loc = state[0] # initialize the current location that pacman is at
-    while True in seen_food: # while not all food have been accounted for
-        closest_dis = float("inf") # establish closest distance to be infinity
-        current_food = 0 # the index of the food we are currently evaluating
-        min_food = (0,0)
-        closest_index = 0 # the index of the closest corner we have found so far
-        for food in food_cords:
-            food_x, food_y = food 
-            if seen_food[food_x, food_y]: # if we have not yet seen this food
-                dis = util.manhattanDistance( current_loc , food) # calculate the manhattan distance of this corner
-                if dis < closest_dis: # if the current dis is less then the closest we have seen so far
-                    closest_dis = dis # set the closest dis t0 the current dis
-                    closest_index = current_food # the index of the closest is now i
-                    min_food = food
-            current_food += 1 # increment this
-        seen_food[min_food[0]][min_food[1]] = False # once we have iterated through all the corners, set the seen_corners of the closest corner to true
-        result += closest_dis # add the found closest distance
-        current_loc = (min_food[0], min_food[1]) # we are now at the closest corner
-    return result
+    # import copy
+    # from game import Grid
+    # result = 0
+    # position, foodGrid = state
+    # food_coords = copy.copy(foodGrid.asList())
+    # seen_food = Grid.copy(foodGrid) # make a copy of pacman's tags
+    # current_loc = state[0] # initialize the current location that pacman is at
+    # while True in seen_food: # while not all food have been accounted for
+    #     closest_dis = float("inf") # establish closest distance to be infinity
+    #     current_food = 0 # the index of the food we are currently evaluating
+    #     min_food = (0,0)
+    #     closest_index = 0 # the index of the closest corner we have found so far
+    #     for food in food_cords:
+    #         food_x, food_y = food 
+    #         if seen_food[food_x, food_y]: # if we have not yet seen this food
+    #             dis = util.manhattanDistance( current_loc , food) # calculate the manhattan distance of this corner
+    #             if dis < closest_dis: # if the current dis is less then the closest we have seen so far
+    #                 closest_dis = dis # set the closest dis t0 the current dis
+    #                 closest_index = current_food # the index of the closest is now i
+    #                 min_food = food
+    #         current_food += 1 # increment this
+    #     seen_food[min_food[0]][min_food[1]] = False # once we have iterated through all the corners, set the seen_corners of the closest corner to true
+    #     result += closest_dis # add the found closest distance
+    #     current_loc = (min_food[0], min_food[1]) # we are now at the closest corner
+    # return result
+
+    # Prim's algorithm
+    # first we have to add all of the edges onto the graph
+    # from heapq import heappush, heappop
+    # from game import Grid
+    # result = 0
+    # heap = []
+    # #problem.heuristicinfo
+    # processed_edges = [] # a dict consisting of booleans which show whether we have processed this edge 
+    # position, foodGrid = state
+    # for x in range(foodGrid.width):
+    #     for y in range(foodGrid.height):
+    #         for x2 in range(foodGrid.width): # make this code more efficient
+    #             for y2 in range(foodGrid.height):
+    #                 print("setting edge for (" + str(x) + ", " + str(y) + ") with (" +  str(x2) + ", " + str(y2) + ") ")
+    #                 if not (x == x2 and y == y2) and (((x,y),(x2,y2)) not in processed_edges and (((x2,y2), (x,y)) not in processed_edges)): # if it's not the same food piece, and if it hsn't already been processed
+    #                     #problem.heuristicInfo[((x,y), (x2, y2))] = util.manhattanDistance((x,y), (x2, y2)) # add to the list of edges problem.heuristicInfo[(node1, node 2)] == distance
+    #                     heappush(heap, (util.manhattanDistance((x,y), (x2, y2)), ((x,y), (x2, y2)) )
+    #                     processed_edges.append(((x,y), (x2, y2)))
+    # # remember to add initial from start to successor
+    # # we should now have a dictionary full of edges
+    # processed_food = Grid.copy(foodGrid)
+    # while 
+
+
+
 
 
 
@@ -572,7 +598,8 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        from search import uniformCostSearch
+        return search.uniformCostSearch(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -606,9 +633,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         that will complete the problem definition.
         """
         x,y = state
-
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.food[x][y] # if the food is still there, it is a valid goal
 
 def mazeDistance(point1, point2, gameState):
     """
