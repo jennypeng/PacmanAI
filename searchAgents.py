@@ -363,14 +363,31 @@ def cornersHeuristic(state, problem):
     on the shortest path from the state to a goal of the problem; i.e.
     it should be admissible (as well as consistent).
     """
+    # our heuristic will be the manhattan distance from the closest corner to the next closest and so on. 
+    # this will be admissible, since it is a relaxtion of the real pacman problem in which there are no walls
+    # it will be consistent because there is no way that the distance of problem with walls can be less then the problem with no walls
+    import copy
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
-    "*** YOUR CODE HERE ***"
-    result = 0
-    for corner in corners:
-       result += util.manhattanDistance( state[0], corner )
+    result = 0 # we will return this
+    seen_corners = copy.copy(state[1]) # make a copy of pacman's tags
+    current_loc = state[0] # initialize the current location that pacman is at
+    while seen_corners != [True, True, True, True]: # while not all corners have been accounted for
+        closest_dis = float("inf") # establish closest distance to be infinity
+        current_corner = 0 # the index of the corner we are currently evaluating
+        closest_index = 0 # the index of the closest corner we have found so far
+        for corner in corners: 
+            if seen_corners[current_corner] == False: # if we have not yet seen this corner
+                dis = util.manhattanDistance( current_loc , corner) # calculate the manhattan distance of this corner
+                if dis < closest_dis: # if the current dis is less then the closest we have seen so far
+                    closest_dis = dis # set the closest dis t0 the current dis
+                    closest_index = current_corner # the index of the closest is now i
+            current_corner += 1 # increment this
+        seen_corners[closest_index] = True # once we have iterated through all the corners, set the seen_corners of the closest corner to true
+        result += closest_dis # add the found closest distance
+        current_loc = corners[closest_index] # we are now at the closest corner
     return result
+    # 692 nodes expanded, path length 106
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
