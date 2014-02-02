@@ -476,9 +476,75 @@ def foodHeuristic(state, problem):
       problem.heuristicInfo['wallCount'] = problem.walls.count()
     Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
     """
+    # import copy
+    # result = 0
+    # position, foodGrid = state
+    # current_loc = position
+    # foodGrid = foodGrid.copy()
+    # food_cords = copy.copy(foodGrid.asList())
+    # # find the closest food and furthest food
+    # minimum = float("inf")
+    # maximum = -1
+    # min_index = (0, 0)
+    # for x in range(foodGrid.width):
+    #     for y in range(foodGrid.height):
+    #         if foodGrid[x][y]:
+    #             current_distance = util.manhattanDistance( current_loc, (x, y))
+    #             if current_distance > maximum:
+    #                 maximum = current_distance
+    #             if current_distance < minimum:
+    #                 minimum = current_distance
+    #                 min_index = (x, y)
+    # result += minimum
+    # minimum = float("inf")
+    # maximum = -1
+    # for x in range(foodGrid.width):
+    #     for y in range(foodGrid.height):
+    #         if foodGrid[x][y]:
+    #             current_distance = util.manhattanDistance( min_index, (x, y))
+    #             if current_distance > maximum:
+    #                 maximum = current_distance
+    #             if current_distance < minimum:
+    #                 minimum = current_distance
+    # result += maximum 
+    # return result
+
+    # number of food dots left
+    # result = 0
+    # position, foodGrid = state
+    # for x in range(foodGrid.width):
+    #     for y in range(foodGrid.height):
+    #         if foodGrid[x][y]:
+    #             result += 1
+    # return result
+    
+    import copy
+    from game import Grid
+    result = 0
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    food_coords = copy.copy(foodGrid.asList())
+    seen_food = Grid.copy(foodGrid) # make a copy of pacman's tags
+    current_loc = state[0] # initialize the current location that pacman is at
+    while True in seen_food: # while not all food have been accounted for
+        closest_dis = float("inf") # establish closest distance to be infinity
+        current_food = 0 # the index of the food we are currently evaluating
+        min_food = (0,0)
+        closest_index = 0 # the index of the closest corner we have found so far
+        for food in food_cords:
+            food_x, food_y = food 
+            if seen_food[food_x, food_y]: # if we have not yet seen this food
+                dis = util.manhattanDistance( current_loc , food) # calculate the manhattan distance of this corner
+                if dis < closest_dis: # if the current dis is less then the closest we have seen so far
+                    closest_dis = dis # set the closest dis t0 the current dis
+                    closest_index = current_food # the index of the closest is now i
+                    min_food = food
+            current_food += 1 # increment this
+        seen_food[min_food[0]][min_food[1]] = False # once we have iterated through all the corners, set the seen_corners of the closest corner to true
+        result += closest_dis # add the found closest distance
+        current_loc = (min_food[0], min_food[1]) # we are now at the closest corner
+    return result
+
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
