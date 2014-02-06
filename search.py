@@ -90,7 +90,7 @@ def genericSearch(problem, fringelist, cost):
         path = fringe.pop() # remove path from fringe
         lastNode = path[-1][0] # the last traversed node of this path
         if problem.isGoalState(lastNode): #if the last node in the path is a goal node
-            print("Aw yeah we've climbed this mountain.")
+            #print("Aw yeah we've climbed this mountain.")
             return [x[1] for x in path] # we return the list of actions taken to get to this state
         if lastNode not in closed: # if the node has not been seen 
             closed.append(lastNode) # add the path to the list of seen nodes

@@ -476,40 +476,81 @@ def foodHeuristic(state, problem):
       problem.heuristicInfo['wallCount'] = problem.walls.count()
     Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
     """
-    # import copy
-    # result = 0
-    # position, foodGrid = state
-    # current_loc = position
-    # foodGrid = foodGrid.copy()
-    # food_cords = copy.copy(foodGrid.asList())
-    # # find the closest food and furthest food
-    # minimum = float("inf")
-    # maximum = -1
-    # min_index = (0, 0)
-    # for x in range(foodGrid.width):
-    #     for y in range(foodGrid.height):
-    #         if foodGrid[x][y]:
-    #             current_distance = util.manhattanDistance( current_loc, (x, y))
-    #             if current_distance > maximum:
-    #                 maximum = current_distance
-    #             if current_distance < minimum:
-    #                 minimum = current_distance
-    #                 min_index = (x, y)
-    # result += minimum
-    # minimum = float("inf")
-    # maximum = -1
-    # for x in range(foodGrid.width):
-    #     for y in range(foodGrid.height):
-    #         if foodGrid[x][y]:
-    #             current_distance = util.manhattanDistance( min_index, (x, y))
-    #             if current_distance > maximum:
-    #                 maximum = current_distance
-    #             if current_distance < minimum:
-    #                 minimum = current_distance
-    # result += maximum 
-    # return result
+    
+    # add all possible edges to the heap:
+    from heapq import heappush, heappop
+    result = 0 # the ending result we're going to return
+    seen = [] # the seen nodes
+    heap = [] # initialize the heap
+    nodes_left = {} # dictionary containing {'node_coord': how many connections you need left} initialize with 2 because each node should have two out going edges
+    position, foodGrid = state # position is pacman's position, 
+    foods = foodGrid.asList() # list of remaining foods
+    if len(foods) == 1:
+        print("niiigiia")
+        return mazeDistance(position, foods[0], problem.startingGameState)
+    #nodes_left[position] = 1
+    if len(foods) == 0:
+        return 0
+    for food in foods:
+        nodes_left[food] = 2 # each node that isn't the end or pacman needs two outgoing edges
+        seen.append(food) #add food to the list of food we have already evaluated
+        for otherfood in foods:
+            if (food != otherfood and otherfood not in seen):
+                #heappush(heap, (util.manhattanDistance(food, otherfood), (food, otherfood))) # push onto the heap (val, ((x, y), (x1, y2))
+                heappush(heap, (mazeDistance(food, otherfood, problem.startingGameState), (food, otherfood))) # push onto the heap (val, ((x, y), (x1, y2))
+    #for food in foods:
+    #    heappush(heap, (util.manhattanDistance(food, position), (food, position)))
+    #while sum(nodes_left.values()) != 1: # its one becaues the last node has to have one remaining
+    #while (connectionsLeft(nodes_left) > 2):
+    while(sum(nodes_left.values()) > 0):
 
-    # number of food dots left
+        edge = heappop(heap) # pop off the current minimum value
+        # print("edge", edge)
+        cost = edge[0]
+        # print("cost", cost)
+        first_coord = edge[1][0]
+        second_coord = edge[1][1]
+        # print("first", first_coord)
+        # print("second", second_coord)
+        # if sum(nodes_left.values()) == 4:
+        #     print("nodes left = 4")
+        #     if not (nodes_left[first_coord] == 1 and nodes_left[second_coord] == 1):
+        #         print("adding edge between", first_coord, "and", second_coord)
+        #         result += cost
+        #         nodes_left[first_coord] -= 1
+        #         nodes_left[second_coord] -= 1
+
+        if (not (nodes_left[first_coord] == 0) and not (nodes_left[second_coord] == 0)):
+            print("adding edge between", first_coord, "and", second_coord)
+            result += cost
+            nodes_left[first_coord] -= 1
+            nodes_left[second_coord] -= 1
+    first_end = (0,0)
+    second_end = (0,0)
+    for key in nodes_left.keys():
+        if nodes_left[key] == 1:
+            print("key", key)
+            if first_end != (0,0):
+                second_end = key
+            else:
+                first_end = key
+    print("ends", first_end, " ", second_end)
+    minimum = min(mazeDistance(position, first_end, problem.startingGameState), mazeDistance(position, second_end, problem.startingGameState))
+    result += minimum
+
+    return result
+
+def connectionsLeft(dict):
+    count = 0
+    for node_count in dict.values():
+        if node_count != 0:
+            count += 1
+    return count
+
+
+
+
+#number of food dots left
     # result = 0
     # position, foodGrid = state
     # for x in range(foodGrid.width):
@@ -517,55 +558,8 @@ def foodHeuristic(state, problem):
     #         if foodGrid[x][y]:
     #             result += 1
     # return result
-    
-    # import copy
-    # from game import Grid
-    # result = 0
-    # position, foodGrid = state
-    # food_coords = copy.copy(foodGrid.asList())
-    # seen_food = Grid.copy(foodGrid) # make a copy of pacman's tags
-    # current_loc = state[0] # initialize the current location that pacman is at
-    # while True in seen_food: # while not all food have been accounted for
-    #     closest_dis = float("inf") # establish closest distance to be infinity
-    #     current_food = 0 # the index of the food we are currently evaluating
-    #     min_food = (0,0)
-    #     closest_index = 0 # the index of the closest corner we have found so far
-    #     for food in food_cords:
-    #         food_x, food_y = food 
-    #         if seen_food[food_x, food_y]: # if we have not yet seen this food
-    #             dis = util.manhattanDistance( current_loc , food) # calculate the manhattan distance of this corner
-    #             if dis < closest_dis: # if the current dis is less then the closest we have seen so far
-    #                 closest_dis = dis # set the closest dis t0 the current dis
-    #                 closest_index = current_food # the index of the closest is now i
-    #                 min_food = food
-    #         current_food += 1 # increment this
-    #     seen_food[min_food[0]][min_food[1]] = False # once we have iterated through all the corners, set the seen_corners of the closest corner to true
-    #     result += closest_dis # add the found closest distance
-    #     current_loc = (min_food[0], min_food[1]) # we are now at the closest corner
-    # return result
 
-    # Prim's algorithm
-    # first we have to add all of the edges onto the graph
-    # from heapq import heappush, heappop
-    # from game import Grid
-    # result = 0
-    # heap = []
-    # #problem.heuristicinfo
-    # processed_edges = [] # a dict consisting of booleans which show whether we have processed this edge 
-    # position, foodGrid = state
-    # for x in range(foodGrid.width):
-    #     for y in range(foodGrid.height):
-    #         for x2 in range(foodGrid.width): # make this code more efficient
-    #             for y2 in range(foodGrid.height):
-    #                 print("setting edge for (" + str(x) + ", " + str(y) + ") with (" +  str(x2) + ", " + str(y2) + ") ")
-    #                 if not (x == x2 and y == y2) and (((x,y),(x2,y2)) not in processed_edges and (((x2,y2), (x,y)) not in processed_edges)): # if it's not the same food piece, and if it hsn't already been processed
-    #                     #problem.heuristicInfo[((x,y), (x2, y2))] = util.manhattanDistance((x,y), (x2, y2)) # add to the list of edges problem.heuristicInfo[(node1, node 2)] == distance
-    #                     heappush(heap, (util.manhattanDistance((x,y), (x2, y2)), ((x,y), (x2, y2)) )
-    #                     processed_edges.append(((x,y), (x2, y2)))
-    # # remember to add initial from start to successor
-    # # we should now have a dictionary full of edges
-    # processed_food = Grid.copy(foodGrid)
-    # while 
+
 
 
 
