@@ -477,96 +477,28 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access problem.heuristicInfo['wallCount']
     """
     
-    # add all possible edges to the heap:
-    from heapq import heappush, heappop
-    result = 0 # the ending result we're going to return
-    seen = [] # the seen nodes
-    heap = [] # initialize the heap
-    nodes_left = {} # dictionary containing {'node_coord': how many connections you need left} initialize with 2 because each node should have two out going edges
-    position, foodGrid = state # position is pacman's position, 
-    foods = foodGrid.asList() # list of remaining foods
-    if len(foods) == 1:
-        print("niiigiia")
-        return mazeDistance(position, foods[0], problem.startingGameState)
-    #nodes_left[position] = 1
+    position, foodGrid = state
+    foods = foodGrid.asList()
+    minimum = 99999999
+    minFood = None
+    result = 0
     if len(foods) == 0:
         return 0
+    if len(foods) == 1:
+        return mazeDistance(position, foods[0], problem.startingGameState)
     for food in foods:
-        nodes_left[food] = 2 # each node that isn't the end or pacman needs two outgoing edges
-        seen.append(food) #add food to the list of food we have already evaluated
-        for otherfood in foods:
-            if (food != otherfood and otherfood not in seen):
-                #heappush(heap, (util.manhattanDistance(food, otherfood), (food, otherfood))) # push onto the heap (val, ((x, y), (x1, y2))
-                heappush(heap, (mazeDistance(food, otherfood, problem.startingGameState), (food, otherfood))) # push onto the heap (val, ((x, y), (x1, y2))
-    #for food in foods:
-    #    heappush(heap, (util.manhattanDistance(food, position), (food, position)))
-    #while sum(nodes_left.values()) != 1: # its one becaues the last node has to have one remaining
-    #while (connectionsLeft(nodes_left) > 2):
-    while(sum(nodes_left.values()) > 2):
-
-        edge = heappop(heap) # pop off the current minimum value
-        # print("edge", edge)
-        cost = edge[0]
-        # print("cost", cost)
-        first_coord = edge[1][0]
-        second_coord = edge[1][1]
-        # print("first", first_coord)
-        # print("second", second_coord)
-        if sum(nodes_left.values()) == 4:
-            print("nodes left = 4")
-            for k, v in nodes_left:
-                print("key", (k,v), "value", nodes_left[(k,v)])
-            if not (nodes_left[first_coord] == 1 and nodes_left[second_coord] == 1 and connectionsLeft(nodes_left) == 3):
-                print("adding edge between", first_coord, "and", second_coord)
-                result += cost
-                nodes_left[first_coord] -= 1
-                nodes_left[second_coord] -= 1
-
-        elif (not (nodes_left[first_coord] == 0) and not (nodes_left[second_coord] == 0)):
-            print("adding edge between", first_coord, "and", second_coord)
-            result += cost
-            nodes_left[first_coord] -= 1
-            nodes_left[second_coord] -= 1
-    first_end = (0,0)
-    second_end = (0,0)
-    for key in nodes_left.keys():
-        if nodes_left[key] == 1:
-            print("key", key)
-            if first_end != (0,0):
-                second_end = key
-            else:
-                first_end = key
-    print("ends", first_end, " ", second_end)
-    minimum = min(mazeDistance(position, first_end, problem.startingGameState), mazeDistance(position, second_end, problem.startingGameState))
+        cost = mazeDistance(position, food, problem.startingGameState)
+        if minimum > cost:
+            minimum = cost
+            minFood = food
     result += minimum
-
+    maximum = 0
+    for food in foods:
+        cost = mazeDistance(minFood, food, problem.startingGameState)
+        if cost > maximum:
+            maximum = cost
+    result += maximum
     return result
-
-def connectionsLeft(dict):
-    count = 0
-    for node_count in dict.values():
-        if node_count != 0:
-            count += 1
-    return count
-
-
-
-
-#number of food dots left
-    # result = 0
-    # position, foodGrid = state
-    # for x in range(foodGrid.width):
-    #     for y in range(foodGrid.height):
-    #         if foodGrid[x][y]:
-    #             result += 1
-    # return result
-
-
-
-
-
-
-
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
