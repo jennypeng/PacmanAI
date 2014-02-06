@@ -502,7 +502,7 @@ def foodHeuristic(state, problem):
     #    heappush(heap, (util.manhattanDistance(food, position), (food, position)))
     #while sum(nodes_left.values()) != 1: # its one becaues the last node has to have one remaining
     #while (connectionsLeft(nodes_left) > 2):
-    while(sum(nodes_left.values()) > 0):
+    while(sum(nodes_left.values()) > 2):
 
         edge = heappop(heap) # pop off the current minimum value
         # print("edge", edge)
@@ -512,15 +512,17 @@ def foodHeuristic(state, problem):
         second_coord = edge[1][1]
         # print("first", first_coord)
         # print("second", second_coord)
-        # if sum(nodes_left.values()) == 4:
-        #     print("nodes left = 4")
-        #     if not (nodes_left[first_coord] == 1 and nodes_left[second_coord] == 1):
-        #         print("adding edge between", first_coord, "and", second_coord)
-        #         result += cost
-        #         nodes_left[first_coord] -= 1
-        #         nodes_left[second_coord] -= 1
+        if sum(nodes_left.values()) == 4:
+            print("nodes left = 4")
+            for k, v in nodes_left:
+                print("key", (k,v), "value", nodes_left[(k,v)])
+            if not (nodes_left[first_coord] == 1 and nodes_left[second_coord] == 1 and connectionsLeft(nodes_left) == 3):
+                print("adding edge between", first_coord, "and", second_coord)
+                result += cost
+                nodes_left[first_coord] -= 1
+                nodes_left[second_coord] -= 1
 
-        if (not (nodes_left[first_coord] == 0) and not (nodes_left[second_coord] == 0)):
+        elif (not (nodes_left[first_coord] == 0) and not (nodes_left[second_coord] == 0)):
             print("adding edge between", first_coord, "and", second_coord)
             result += cost
             nodes_left[first_coord] -= 1
